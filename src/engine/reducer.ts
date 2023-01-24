@@ -11,6 +11,10 @@ const gameReducer = (state: GlobalGameState, action: GameAction) => {
       if (state.active) {
         return state;
       }
+      return {
+        ...state,
+        active: true,
+      };
 
     default:
       return state;
