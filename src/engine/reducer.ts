@@ -15,6 +15,11 @@ const gameReducer = (state: GlobalGameState, action: GameAction) => {
         ...state,
         active: true,
       };
+    case "nav":
+      return {
+        ...state,
+        nav: action.payload,
+      };
 
     default:
       return state;

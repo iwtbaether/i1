@@ -9,6 +9,7 @@ interface GlobalGameState {
     maxEnergy: number;
     currentEnergy: number;
   };
+  nav: GameNav;
 }
 
 const initialGameState: GlobalGameState = {
@@ -22,9 +23,11 @@ const initialGameState: GlobalGameState = {
     maxEnergy: 0,
     currentEnergy: 0,
   },
+  nav: "home",
 };
 
-type GameActions = "tick" | "reset" | "start";
+type GameActions = "tick" | "reset" | "start" | "end" | "nav";
+type GameNav = "home" | "game" | "settings" | "about";
 
 type GameAction = {
   type: GameActions;
@@ -32,4 +35,4 @@ type GameAction = {
 };
 
 export { initialGameState };
-export type { GlobalGameState, GameActions, GameAction };
+export type { GlobalGameState, GameActions, GameAction, GameNav };
