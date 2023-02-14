@@ -17,6 +17,33 @@ enum RoomHidingSpot {
   perfect = "Perfect",
 }
 
+export enum PlayerSkills {
+  combat = "Combat",
+  stealth = "Stealth",
+  agility = "Agility",
+  search = "Search",
+  mining = "Mining",
+  fishing = "Fishing",
+  woodcutting = "Woodcutting",
+}
+
+export interface EncounterData {
+  type: EncounterType;
+  discovered: boolean;
+  completed: boolean;
+}
+
+export interface PlayerSkillData {
+  xp: number;
+  level: number;
+}
+
+export interface PlayerSkillCalcs {
+  multiplier: number;
+  requiredXp: number;
+  xpToNextLevel: number;
+}
+
 const EncounterTypeOcurrences: { [key in keyof typeof EncounterType]: number } =
   {
     Enemy: 1000,

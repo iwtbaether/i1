@@ -8,18 +8,21 @@ import NavBar from "./ui/NavBar";
 import town from "./assets/art/town.png";
 import { Sneak } from "./ui/Sneak";
 import RightPanel from "./ui/RightPanel";
+import { MobGameContext } from "./context/MobGameContext";
 
 function App() {
   const [state, dispatch] = React.useReducer(gameReducer, initialGameState);
   const { log, add } = React.useContext(LogContext);
+  const { game } = React.useContext(MobGameContext);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
+      game.timer.tick();
       if (false) {
         dispatch({ type: "tick" });
         add(createMessage("tick"));
       }
-    }, 1000);
+    }, 300);
 
     return () => clearInterval(timer);
   }, []);
@@ -40,18 +43,18 @@ function App() {
               })}
             </div>
             <div className="GameContent">
-              <img
+              {/* <img
                 src={town}
                 className="town-art"
                 alt="town art"
                 style={{ width: "100%" }}
-              />
-              <div>hi there</div>
+              /> */}
+              {/* <div>hi there</div>
               <div>
                 <button onClick={() => dispatch({ type: "start" })}>
                   Start
                 </button>
-              </div>
+              </div> */}
               <div>
                 <Sneak />
               </div>

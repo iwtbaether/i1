@@ -1,12 +1,13 @@
 import { observer } from "mobx-react-lite";
 import {
-  PlayerAgent,
   PlayerSkillCalcs,
   PlayerSkillData,
   PlayerSkills,
-} from "../engine/mob/snake";
-
-const PA = new PlayerAgent();
+} from "../engine/mob/SnakeTypes";
+import { PlayerAgent } from "../engine/mob/PlayerAgent";
+import React from "react";
+import { MobGameContext } from "../context/MobGameContext";
+import { SimpleProgressBar } from "./SimpleProgressBar";
 
 interface SkillDisplayBoxProps {
   skill: keyof typeof PlayerSkills;
@@ -58,6 +59,7 @@ const SkillDisplayBox = observer(
           </div>
           <div>Multiplier: {multiplier}</div>
         </div>
+        <SimpleProgressBar percent={xp / requiredXp} />
       </div>
     );
   }
@@ -86,7 +88,13 @@ const PlayerSkillContainer = observer(
         <div>Box</div>
         {Object.keys(PlayerSkills).map((skillKey) => {
           const sKey = skillKey as keyof typeof PlayerSkills;
-          return <SkillBoxExtractor playerAgent={playerAgent} skill={sKey} />;
+          return (
+            <SkillBoxExtractor
+              playerAgent={playerAgent}
+              skill={sKey}
+              key={sKey}
+            />
+          );
         })}
       </div>
     );
@@ -94,6 +102,7 @@ const PlayerSkillContainer = observer(
 );
 
 const RightPanel = () => {
+  const { game } = React.useContext(MobGameContext);
   return (
     <div
       style={{
@@ -103,7 +112,7 @@ const RightPanel = () => {
       }}
     >
       <div>
-        <PlayerSkillContainer playerAgent={PA} />
+        <PlayerSkillContainer playerAgent={game.playerAgent} />
       </div>
     </div>
   );
