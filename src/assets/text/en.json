@@ -1,0 +1,28 @@
+{
+  "SpaceCorps": {
+    "TypesDescription": {
+      "private": "Private",
+      "corporate": "Corporate",
+      "government": "Government",
+      "military": "Military",
+      "pirate": "Pirate",
+      "police": "Police",
+      "religious": "Religious",
+      "rogue": "Rogue",
+      "scientific": "Scientific",
+      "unaffiliated": "Unaffiliated"
+    },
+    "TypesName": {
+      "private": "Private",
+      "corporate": "Corporate",
+      "government": "Government",
+      "military": "Military",
+      "pirate": "Pirate",
+      "police": "Police",
+      "religious": "Religious",
+      "rogue": "Rogue",
+      "scientific": "Scientific",
+      "unaffiliated": "Unaffiliated"
+    }
+  }
+}

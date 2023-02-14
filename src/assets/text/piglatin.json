@@ -1,0 +1,28 @@
+{
+  "SpaceCorps": {
+    "TypesDescription": {
+      "private": "Rivatepay",
+      "corporate": "Orporatecay",
+      "government": "Overnmentgay",
+      "military": "Ilitarymay",
+      "pirate": "Iratepay",
+      "police": "Olicepay",
+      "religious": "Eligiousray",
+      "rogue": "Ogueray",
+      "scientific": "Cientificsay",
+      "unaffiliated": "Naffiliateduay"
+    },
+    "TypesName": {
+      "private": "Rivatepay",
+      "corporate": "Orporatecay",
+      "government": "Overnmentgay",
+      "military": "Ilitarymay",
+      "pirate": "Iratepay",
+      "police": "Olicepay",
+      "religious": "Eligiousray",
+      "rogue": "Ogueray",
+      "scientific": "Cientificsay",
+      "unaffiliated": "Naffiliateduay"
+    }
+  }
+}

@@ -6,6 +6,8 @@ import { gameReducer } from "./engine/reducer";
 import { initialGameState } from "./engine/types";
 import NavBar from "./ui/NavBar";
 import town from "./assets/art/town.png";
+import { Sneak } from "./ui/Sneak";
+import RightPanel from "./ui/RightPanel";
 
 function App() {
   const [state, dispatch] = React.useReducer(gameReducer, initialGameState);
@@ -13,8 +15,10 @@ function App() {
 
   React.useEffect(() => {
     const timer = setInterval(() => {
-      dispatch({ type: "tick" });
-      add(createMessage("tick"));
+      if (false) {
+        dispatch({ type: "tick" });
+        add(createMessage("tick"));
+      }
     }, 1000);
 
     return () => clearInterval(timer);
@@ -31,8 +35,8 @@ function App() {
           </div>
           <div className="main">
             <div className="GameLog">
-              {log.map((message) => {
-                return <div>{message.message}</div>;
+              {log.map((message, index) => {
+                return <div key={index}>{message.message}</div>;
               })}
             </div>
             <div className="GameContent">
@@ -48,7 +52,11 @@ function App() {
                   Start
                 </button>
               </div>
+              <div>
+                <Sneak />
+              </div>
             </div>
+            <RightPanel />
           </div>
           <div className="footer">
             <div> {state.count} seconds elapsed.</div>
