@@ -1,5 +1,6 @@
-import { makeAutoObservable, makeObservable, observable } from "mobx";
-import { createUsableNumbers, mulberry32 } from "../../ui/mulberry32";
+import { GameModule } from "./interfaces/GameModule";
+import { action, makeAutoObservable, makeObservable, observable } from "mobx";
+import { createUsableNumbers, mulberry32 } from "../../util/mulberry32";
 import {
   getRandomEnumValue,
   getWeightedRandomEnumValue,
@@ -11,7 +12,7 @@ import {
   RoomHidingSpot,
   RoomPurpose,
 } from "./SnakeTypes";
-import { Chest } from "./Chest";
+import { Chest, ChestSave } from "./Chest";
 import { Game } from "./Game";
 
 interface RoomProps {
@@ -21,12 +22,63 @@ interface RoomProps {
   level?: number;
 }
 
-class Room {
+interface RoomSave {
+  // simple
+  id: number;
+  nums: number[];
+  name: string;
+  explored: number;
+  exit: number;
+  level: number;
+  encounters: EncounterData[];
+  // class
+  chests: ChestSave[];
+}
+
+class Room implements GameModule<RoomSave> {
+  saveKey = "room";
+  getSaveData = () => {
+    return {
+      id: this.id,
+      nums: this.nums,
+      name: this.name,
+      explored: this.explored,
+      exit: this.exit,
+      level: this.level,
+      encounters: this.encounters,
+      // todo, store these differenlty
+      chests: this.chests.map((c) => c.getSaveData()),
+    };
+  };
+
+  loadSaveData = (data: Partial<RoomSave>) => {
+    // restore name, id, and level
+    this.name = data.name || this.name;
+    this.id = data.id || this.id;
+    this.level = data.level || this.level;
+
+    // regenerate room
+    this.generateRoomFromSeed(this.id);
+
+    // restore other room properties
+    this.explored = data.explored || this.explored;
+    this.exit = data.exit || this.exit;
+    this.encounters = data.encounters || this.encounters;
+
+    // TODO, restore chests
+    this.chests.forEach((c, i) => {
+      if (data?.chests?.[i]) c.loadSaveData(data.chests[i]);
+    });
+
+    return;
+  };
+
   game: Game;
   id = Math.random() * 10000;
   nums: number[] = [];
-  name = "";
+  name = "DEF";
   explored: number = 0;
+  exit: number = 0;
   chestCount = 0;
   level: number = 1;
   chests: Chest[] = [];
@@ -35,14 +87,19 @@ class Room {
   purpose: RoomPurpose = RoomPurpose.bathroom; // default to bathroom
 
   constructor(props: RoomProps) {
-    makeAutoObservable(this, { game: false });
+    makeAutoObservable(this, { game: false, loadSaveData: action });
+    this.level = props.level || 1;
     this.game = props.game;
     const seed = props.id || Math.floor(Math.random() * 10000);
-    const name = props.name || `Room ${seed}`;
+    const name = props.name || `Room ${seed} (${this.level})`;
     this.id = seed;
     this.name = name;
     this.generateRoomFromSeed(seed);
   }
+
+  rename = (name: string) => {
+    this.name = name;
+  };
 
   generateRoomFromSeed(seed: number) {
     console.log("Generating room from seed: " + seed);
@@ -168,6 +225,22 @@ class Room {
 
   get explorePerFind() {
     return this.level * 10;
+  }
+
+  get exitCost() {
+    return this.level * 100;
+  }
+
+  gainExit(count: number) {
+    if (this.exit >= this.exitCost) {
+      this.game.timer.setActivity("idle");
+      return;
+    }
+    this.exit += count;
+  }
+
+  get exitReady() {
+    return this.exit >= this.exitCost;
   }
 }
 

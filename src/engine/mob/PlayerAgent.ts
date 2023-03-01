@@ -1,10 +1,47 @@
 import { makeObservable, observable, action } from "mobx";
 import { Game } from "./Game";
+import { GameModule } from "./interfaces/GameModule";
 import { PlayerSkills, PlayerSkillData, PlayerSkillCalcs } from "./SnakeTypes";
 
-class PlayerAgent {
-  skills: Map<PlayerSkills, PlayerSkillData> = new Map();
-  skillCalcs: Map<PlayerSkills, PlayerSkillCalcs> = new Map();
+interface PlayerAgentSave {
+  skills: { [key in PlayerSkills]: PlayerSkillData };
+}
+
+class PlayerAgent implements GameModule<PlayerAgentSave> {
+  saveKey = "playerAgent";
+  getSaveData = () => {
+    return {
+      skills: this.skills,
+    };
+  };
+  loadSaveData = (data: Partial<PlayerAgentSave>) => {
+    console.log("Player Agent Load", data, this.skills);
+    this.skills = data.skills || this.skills;
+    // data.skills?.forEach((value, key) => {
+    //   console.log("KEY / VALUE");
+    //   console.log(key);
+    //   console.log(value[0]);
+    //   this.skills.set(key, value);
+    // });
+  };
+
+  skills: { [key in PlayerSkills]: PlayerSkillData } = Object.values(
+    PlayerSkills
+  ).reduce((acc, skill) => {
+    acc[skill] = { xp: 0, level: 1 };
+    return acc;
+  }, {} as { [key in PlayerSkills]: PlayerSkillData });
+  skillCalcs: { [key in PlayerSkills]: PlayerSkillCalcs } = Object.values(
+    PlayerSkills
+  ).reduce((acc, skill) => {
+    acc[skill] = {
+      multiplier: 1,
+      requiredXp: 100,
+      xpToNextLevel: 100,
+    };
+    return acc;
+  }, {} as { [key in PlayerSkills]: PlayerSkillCalcs });
+
   game: Game;
   constructor(game: Game) {
     makeObservable(this, {
@@ -17,19 +54,19 @@ class PlayerAgent {
     this.game = game;
     // initialize skills by iterating over the enum
     Object.values(PlayerSkills).forEach((skill, index) => {
-      this.skills.set(skill, { xp: index * 2, level: index + 1 });
+      this.skills[skill] = { xp: index * 2, level: index + 1 };
     });
     this.calculateSkillCalcs();
   }
 
   calculateSkillCalcs() {
-    this.skills.forEach((value, key) => {
-      this.calculateSingleSkillCalc(key);
+    Object.values(PlayerSkills).forEach((skill, index) => {
+      this.calculateSingleSkillCalc(skill);
     });
   }
 
   calculateSingleSkillCalc(skill: PlayerSkills) {
-    const skillData = this.skills.get(skill);
+    const skillData = this.skills[skill];
     if (skillData) {
       const multiplier = 1.1;
       const skillMultiplier = Math.pow(multiplier, skillData.level - 1);
@@ -37,36 +74,39 @@ class PlayerAgent {
         Math.pow(skillData.level, multiplier) * 100
       );
       const xpToNextLevel = requiredXp - skillData.xp;
-      this.skillCalcs.set(skill, {
+      this.skillCalcs[skill] = {
         multiplier: skillMultiplier,
         requiredXp,
         xpToNextLevel,
-      });
+      };
     }
   }
 
   addXp = (skill: PlayerSkills, xp: number) => {
     xp = Math.floor(xp);
-    const skillData = this.skills.get(skill);
-    const skillCalc = this.skillCalcs.get(skill);
+    const skillData = this.skills[skill];
+    const skillCalc = this.skillCalcs[skill];
     if (skillData && skillCalc) {
       skillData.xp += xp;
       if (skillData.xp >= skillCalc.requiredXp) {
         skillData.level += 1;
         skillData.xp -= skillCalc.requiredXp;
       }
-      this.skills.set(skill, skillData);
+      this.skills[skill] = skillData;
       this.calculateSingleSkillCalc(skill);
     }
   };
 
   exploreTick = () => {
-    const mult = this.skillCalcs.get(PlayerSkills.search)?.multiplier;
-    if (!mult) {
-      throw new Error("Invalid mult: " + mult);
-    }
+    const mult = this.skillCalcs[PlayerSkills.search].multiplier;
     this.addXp(PlayerSkills.search, mult);
     this.game.room.gainExplore(mult);
+  };
+
+  exitTick = () => {
+    const mult = this.skillCalcs[PlayerSkills.agility].multiplier;
+    this.addXp(PlayerSkills.agility, mult);
+    this.game.room.gainExit(mult);
   };
 }
 

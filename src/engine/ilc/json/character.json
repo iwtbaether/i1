@@ -1,0 +1,4 @@
+{
+  "races": ["Human", "Elf", "Dwarf", "Orc"],
+  "classes": ["Warrior", "Mage", "Rogue", "Priest"]
+}

@@ -1,8 +1,10 @@
+import { makeAutoObservable } from "mobx";
 import React from "react";
 
 interface LogContextProps {
   log: LogState;
   add: (message: LogMessage) => void;
+  clear: VoidFunction;
 }
 
 type LogState = LogMessage[];
@@ -28,6 +30,10 @@ const add = (message: LogMessage) => {
   log.push(message);
 };
 
+const clear = () => {
+  log.length = 0;
+};
+
 const createMessage = (message: string, type?: LogType): LogMessage => {
   return {
     message,
@@ -36,9 +42,32 @@ const createMessage = (message: string, type?: LogType): LogMessage => {
   };
 };
 
+class Logger {
+  log: LogState = [
+    {
+      message: "Welcome!",
+      type: "info",
+      timestamp: Date.now(),
+    },
+  ];
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+  add = (message: LogMessage) => {
+    this.log.push(message);
+  };
+  clear = () => {
+    this.log.length = 0;
+  };
+}
+
+const logger = new Logger();
+
 const LogContext = React.createContext<LogContextProps>({
-  log,
-  add,
+  log: logger.log,
+  add: logger.add,
+  clear: logger.clear,
 });
 
 export { LogContext, createMessage };

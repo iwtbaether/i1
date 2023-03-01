@@ -1,16 +1,18 @@
 import { observer } from "mobx-react-lite";
-import { TodoList, Todo } from "../engine/mob/todoExample";
-import { Room } from "../engine/mob/Room";
+import { TodoList, Todo } from "../../engine/mob/todoExample";
+import { Room } from "../../engine/mob/Room";
 import {
   ChestRarities,
   EncounterType,
   RoomHidingSpot,
-} from "../engine/mob/SnakeTypes";
+} from "../../engine/mob/SnakeTypes";
 import React from "react";
-import { ChestNames } from "../engine/mob/RoomChestMap";
+import { ChestNames } from "../../engine/mob/RoomChestMap";
 import { action, makeObservable, observable } from "mobx";
-import { MobGameContext } from "../context/MobGameContext";
-import { ActivityBar } from "./ActivityBar";
+import { MobGameContext } from "../../context/MobGameContext";
+import { ActivityBar } from "../things/ActivityBar";
+import { SimpleProgressBar } from "../components/SimpleProgressBar";
+import { TodoListView } from "../things/TodoListExample";
 
 const BadEncounterStyle = { color: "red" };
 const GoodEncounterStyle = { color: "green" };
@@ -57,42 +59,23 @@ const store = new TodoList([
   new Todo("Write simpler code"),
 ]);
 
-const TodoListView = observer(({ todoList }: { todoList: TodoList }) => (
-  <div>
-    <ul>
-      {todoList.todos.map((todo) => (
-        <TodoView todo={todo} key={todo.id} />
-      ))}
-    </ul>
-    Tasks left: {todoList.unfinishedTodoCount}
-  </div>
-));
-
-const TodoView = observer(({ todo }: { todo: Todo }) => (
-  <li>
-    <input
-      type="checkbox"
-      checked={todo.finished}
-      onClick={() => todo.toggle()}
-      onChange={() => {}}
-    />
-    {todo.title}
-  </li>
-));
-
 const RoomView = observer(({ room }: { room: Room }) => (
   <div>
     <ActivityBar />
+    <SimpleProgressBar percent={room.exit / room.exitCost} />
+
     <div>
       {room.name} - Hiding: {room.hidingSpot}
     </div>
     {!room.isExplored && (
       <div>
-        Exploration Progress: {room.explored}/{room.explorePerFind}
+        Exploration Progress: {Math.floor(room.explored)}/{room.explorePerFind}
+        <SimpleProgressBar percent={room.explored / room.explorePerFind} />
       </div>
     )}
     <div>
       Finds {room.remainingFinds}/{room.totalFinds}
+      <SimpleProgressBar percent={room.remainingFinds / room.totalFinds} />
     </div>
     <div>{room.purpose}</div>
     <div>Chests: {room.chestCount}</div>

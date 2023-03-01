@@ -1,16 +1,34 @@
-import { makeObservable, observable } from "mobx";
-import { createUsableNumbers, mulberry32 } from "../../ui/mulberry32";
+import { makeAutoObservable, makeObservable, observable } from "mobx";
+import { createUsableNumbers, mulberry32 } from "../../util/mulberry32";
 import {
   getRandomEnumValue,
   getWeightedRandomEnumValue,
 } from "../../util/enumUtils";
+import { GameModule } from "./interfaces/GameModule";
 import {
   ChestRarities,
   ChestRarityOcurrences2,
   ChestTypes,
 } from "./SnakeTypes";
 
-export class Chest {
+export interface ChestSave {
+  discovered: boolean;
+  completed: boolean;
+}
+
+export class Chest implements GameModule<ChestSave> {
+  saveKey = "chest";
+  getSaveData = () => {
+    return {
+      discovered: this.discovered,
+      completed: this.completed,
+    };
+  };
+  loadSaveData = (data: Partial<ChestSave>) => {
+    this.discovered = data.discovered || this.discovered;
+    this.completed = data.completed || this.completed;
+  };
+
   id = Math.random() * 10000;
   nums: number[] = [];
   name = "";
@@ -19,11 +37,9 @@ export class Chest {
   discovered: boolean = false;
   completed: boolean = false;
 
-  constructor(name: string, id?: number) {
-    makeObservable(this, {
-      name: observable,
-    });
-    this.name = name;
+  constructor(name?: string, id?: number) {
+    makeAutoObservable(this);
+    this.name = name || "";
     if (id) {
       this.generateChestFromSeed(id);
     } else {

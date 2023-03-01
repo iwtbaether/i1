@@ -1,0 +1,41 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.content {
+  flex: 1;
+  background-color: #ccc;
+  overflow: auto;
+  display: flex;
+}
+
+.left {
+  overflow-y: scroll; 
+  flex-basis: 200px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.center {
+  overflow-y: scroll; 
+  flex-grow: 1;
+}
+
+.right {
+  flex-basis: 200px;
+  flex-grow: 0;
+  background-color: lightblue;
+}
+
+.footer {
+  height: 25px;
+}

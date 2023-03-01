@@ -6,6 +6,10 @@ export type ChestTypeMap = { [key in ChestTypes]: ChestRarityMap };
 
 export type ChestRarityMap = { [key in ChestRarities]: string };
 
+export type ChestData = {
+  name: string;
+};
+
 export const ChestNames: RoomChestMap = {
   [RoomPurpose.storage]: {
     [ChestTypes.primitive]: {
